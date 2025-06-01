@@ -25,7 +25,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const headerRow = table.insertRow();
 
         // Define the headers
-        const headers = ['Product Name', 'Quantity'];
+        const headers = ['Product Name', 'Quantity', 'Actions'];
 
         // Loop through headers and create <th> cells for each
         headers.forEach(headerText => {
@@ -35,16 +35,78 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         // Loop through each item in stockData to create table rows
-        stockData.forEach(({ name, quantity }) => {
+        stockData.forEach((item, index) => {
             const row = table.insertRow();               // Create new row
-            row.insertCell().textContent = name;         // First cell: product name
-            row.insertCell().textContent = quantity;     // Second cell: quantity
+            row.insertCell().textContent = item.name;         // First cell: product name
+            row.insertCell().textContent = item.quantity;     // Second cell: quantity
         });
 
+        const actionsCell = row.insertCell();
+
+        const editBtn = document.createElement('button');
+        editBtn.textContent = 'Edit';
+        editBtn.onclick = () => handleEdit(index);
+
+        const deleteBtn = document.createElement('button');
+        deleteBtn.textContent = 'Delete';
+        deleteBtn.onclick = () => {
+            stockData.splice(index, 1);
+            renderTable();
+        };
+
+        const addBtn = document.createElement('button');
+        addBtn.textContent = '+';
+        addBtn.onclick = () => {
+            const amount = prompt("Add how many?");
+            const num = parseInt(amount, 10);
+            if (!isNaN(num) && num > 0) {
+                stockData[index].quantity += num;
+                renderTable();
+            }
+        };
+
+        const removeBtn = document.createElement('button');
+        removeBtn.textContent = '−';
+        removeBtn.onclick = () => {
+            const amount = prompt("Remove how many?");
+            const num = parseInt(amount, 10);
+            if (!isNaN(num) && num > 0 && num <= stockData[index].quantity) {
+                stockData[index].quantity -= num;
+                renderTable();
+            } else {
+                alert("Invalid amount.");
+            }
+        };
+
+        actionsCell.appendChild(editBtn);
+        actionsCell.appendChild(addBtn);
+        actionsCell.appendChild(removeBtn);
+        actionsCell.appendChild(deleteBtn);
+    });
+    
         // Clear the previous table content before appending new
         tableContainer.innerHTML = '';
         tableContainer.appendChild(table); // Add the newly created table to the DOM
     }
+
+    function handleEdit(index) {
+        const item = stockData[index];
+        const newName = prompt("Edit product name:", item.name);
+        const newQuantity = prompt("Edit quantity:", item.quantity);
+
+        if (newName && newQuantity) {
+            const parsedQuantity = parseInt(newQuantity, 10);
+
+            if (!isNaN(parsedQuantity) && parsedQuantity >= 0) {
+                item.name = newName.trim();
+                item.quantity = parsedQuantity;
+                renderTable();
+            } else {
+                alert("Invalid quantity.");
+            }
+        }
+    }
+
 
     // Event listener for form submission
     form.addEventListener('submit', (event) => {
