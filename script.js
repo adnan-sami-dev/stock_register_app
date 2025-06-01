@@ -56,8 +56,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Validate inputs: name must not be empty, and quantity must be a positive number
         if (name && quantity > 0) {
-            // Add a new product entry to the array
-            stockData.push({ name, quantity });
+            // Check if product already exists (case-insensitive match)
+            const existingProduct = stockData.find(item => item.name.toLowerCase() === name.toLowerCase());
+
+            if (existingProduct) {
+                // Update quantity if product exists
+                existingProduct.quantity += quantity;
+            } else {
+                // Add as new product if it doesn't exist
+                stockData.push({ name, quantity });
+            }
 
             // Re-render the table with the new data
             renderTable();
